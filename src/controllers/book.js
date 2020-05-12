@@ -34,7 +34,7 @@ module.exports = {
     }
 
     const result = bookModel.create({ title, description, genre_id: genreId, author_id: authorId, image: req.file.filename, book_status_id: 1 })
-    if (result) return res.status(201).send(response(true, req.body, 'Data has been created'))
+    if (result) return res.status(201).send(response(true, req.body, 'Book has been created'))
     else res.status(500).send(response(false, req.body, 'Internal server error or unhandled error'))
   },
   patch: async (req, res) => {
@@ -63,7 +63,7 @@ module.exports = {
     }
 
     const result = bookModel.update([{ title, description, genre_id: genreId, author_id: authorId, image, book_status_id: 1 }, { id }])
-    if (result) return res.status(200).send(response(true, req.body, 'Data has been updated'))
+    if (result) return res.status(200).send(response(true, req.body, 'Book has been updated'))
     else res.status(500).send(response(false, req.body, 'Internal server error or unhandled error'))
   },
   delete: async (req, res) => {
@@ -85,7 +85,7 @@ module.exports = {
     }
 
     const result = await bookModel.delete({ id })
-    if (result) return res.status(200).send(response(true, req.body, 'Data has been deleted'))
+    if (result) return res.status(200).send(response(true, req.body, 'Book has been deleted'))
     else return res.status(500).send(response(false, req.body, 'Internal server error or unhandled error'))
   }
 }

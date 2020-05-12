@@ -15,7 +15,7 @@ module.exports = {
     if (existGenre) return res.status(400).send(response(false, req.body, 'Genre is exists'))
 
     const result = genreModel.create({ name })
-    if (result) return res.status(201).send(response(true, req.body, 'Data has been created'))
+    if (result) return res.status(201).send(response(true, req.body, 'Genre has been created'))
     else return res.status(500).send(response(false, req.body, 'Server Error or Error not handled'))
   },
   patch: async (req, res) => {
@@ -27,7 +27,7 @@ module.exports = {
     if (!existGenre) return res.status(400).send(response(false, req.body, 'Genre id is not valid'))
 
     const result = genreModel.update([{ name }, { id }])
-    if (result) return res.status(200).send(response(true, req.body, 'Data has been updated'))
+    if (result) return res.status(200).send(response(true, req.body, 'Genre has been updated'))
     else return res.status(500).send(response(false, req.body, 'Server Error or Error not handled'))
   },
   delete: async (req, res) => {
@@ -38,7 +38,7 @@ module.exports = {
     if (!existGenre) return res.status(400).send(response(false, req.params, 'Genre id is not valid'))
 
     const result = genreModel.delete({ id })
-    if (result) return res.status(200).send(response(true, req.body, 'Data has been deleted'))
+    if (result) return res.status(200).send(response(true, req.body, 'Genre has been deleted'))
     else return res.status(500).send(response(false, req.params, 'Server Error or Error not handled'))
   }
 }

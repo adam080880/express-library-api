@@ -13,7 +13,7 @@ module.exports = {
     if (!isFilled({ name, description })) return res.send(response(false, req.body, 'Name and Description must be filled'))
 
     const result = await authorModel.create({ name, description })
-    if (result) return res.send(response(true, req.body, 'Data has been created'))
+    if (result) return res.send(response(true, req.body, 'Author has been created'))
     else return res.send(response(false, req.body, 'Server Error or Error not handled'))
   },
   patch: async (req, res) => {
@@ -26,7 +26,7 @@ module.exports = {
     if (!isExistAuthor) return res.send(response(false, req.body, 'Author id is not valid'))
 
     const result = await authorModel.update([{ name, description }, { id }])
-    if (result) return res.send(response(true, req.body, 'Data has been updated'))
+    if (result) return res.send(response(true, req.body, 'Author has been updated'))
     else return res.send(response(false, req.body, 'Server Error or Error not handled'))
   },
   delete: async (req, res) => {
@@ -38,7 +38,7 @@ module.exports = {
     if (!isExistAuthor) return res.send(response(false, req.params, 'Author id is not valid'))
 
     const result = await authorModel.delete({ id })
-    if (result) return res.send(response(true, req.params, 'Data has been deleted'))
+    if (result) return res.send(response(true, req.params, 'Author has been deleted'))
     else return res.send(response(false, req.params, 'Server Error or Error not handled'))
   }
 }
