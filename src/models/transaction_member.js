@@ -30,7 +30,8 @@ module.exports = {
           }
           con.commit((commitErr) => {
             if (commitErr) reject(Error(commitErr).message)
-            resolve(true)
+            if (res.affectedRows > 0) resolve(true)
+            else resolve(false)
           })
         })
       })

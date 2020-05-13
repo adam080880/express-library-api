@@ -9,18 +9,27 @@ module.exports = {
                  (SELECT users.email FROM users WHERE users.id=t.member_id) as member,
                  transaction_statuses.name as status FROM ${table} t,
                  books, transaction_statuses WHERE transaction_statuses.id=t.transaction_status_id
-                 AND books.id=t.book_id AND WHERE LIMIT ${end} OFFSET ${start} ORDER BY ${data[1]} ${data[2]}`
+                 AND books.id=t.book_id AND (books.title LIKE ? OR (SELECT users.email FROM users WHERE users.id=t.admin_id) LIKE ? OR (SELECT users.email FROM users WHERE users.id=t.member_id) LIKE ?
+                 OR transaction_statuses.name LIKE ?) ORDER BY ${data[1]} ${data[2]} LIMIT ${end} OFFSET ${start}`
     return new Promise((resolve, reject) => {
-      con.query(sql, (err, res) => {
+      const search = '%' + data[0] + '%'
+      con.query(sql, [search, search, search, search], (err, res) => {
         if (err) reject(Error(err))
         if (res.length > 0) resolve(res)
         else resolve(false)
       })
     })
   },
-  count: () => {
+  count: (data) => {
     return new Promise((resolve, reject) => {
-      con.query(`SELECT COUNT(*) as total FROM ${table}`, (err, res) => {
+      const query = '%' + data[0] + '%'
+      con.query(`SELECT t.id, t.promise_returned_at, books.title as book_title,
+                (SELECT users.email FROM users WHERE users.id=t.admin_id) as admin,
+                (SELECT users.email FROM users WHERE users.id=t.member_id) as member,
+                transaction_statuses.name as status FROM ${table} t,
+                books, transaction_statuses WHERE transaction_statuses.id=t.transaction_status_id
+                AND books.id=t.book_id AND (books.title LIKE ? OR (SELECT users.email FROM users WHERE users.id=t.admin_id) LIKE ? OR (SELECT users.email FROM users WHERE users.id=t.member_id) LIKE ?
+                OR transaction_statuses.name LIKE ?) ORDER BY ${data[1]} ${data[2]}`, [query, query, query, query], (err, res) => {
         if (err) reject(Error(err))
         resolve(res[0].total)
       })
@@ -43,7 +52,8 @@ module.exports = {
     return new Promise((resolve, reject) => {
       con.query(sql, data, (err, res) => {
         if (err) reject(Error(err))
-        resolve(true)
+        if (res.affectedRows > 0) resolve(true)
+        else resolve(false)
       })
     })
   },
@@ -71,7 +81,8 @@ module.exports = {
           }
           con.commit((commitError) => {
             if (commitError) reject(Error(commitError).message)
-            resolve(true)
+            if (res.affectedRows > 0) resolve(true)
+            else resolve(false)
           })
         })
       })
