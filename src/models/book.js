@@ -4,18 +4,21 @@ const table = 'books'
 const relationalTable = 'authors, genres, book_statuses'
 
 module.exports = {
-  count: () => {
+  count: (data) => {
+    const query = `SELECT COUNT(*) as total FROM ${table} WHERE title LIKE ? ORDER BY ${data[1]} ${data[2]}`
     return new Promise((resolve, reject) => {
-      con.query(`SELECT COUNT(*) as total FROM ${table}`, (err, res) => {
-        if (err) reject(Error(err))
-        resolve(res[0].total)
-      })
+      con.query(query,
+        [('%' + data[0] + '%')],
+        (err, res) => {
+          if (err) reject(Error(err))
+          resolve(res[0].total)
+        })
     })
   },
-  get: (start, end, data = {}) => {
-    const sql = `SELECT * FROM ${table} LIMIT ${end} OFFSET ${start}`
+  get: (start, end, data = []) => {
+    const sql = `SELECT * FROM ${table} WHERE title LIKE ? ORDER BY ${data[1]} ${data[2]} LIMIT ${end} OFFSET ${start}`
     return new Promise((resolve, reject) => {
-      con.query(sql, (err, res) => {
+      con.query(sql, [('%' + data[0] + '%')], (err, res) => {
         if (err) reject(Error(err))
         resolve(res)
       })
