@@ -11,7 +11,7 @@ module.exports = {
   get: async (req, res) => {
     const { APP_URL } = process.env
 
-    const data = await pagination(req.query, bookModel, 'books', 'book')
+    const data = await pagination(req.query, bookModel, 'books', 'books')
     data.data = data.data.map((val, index) => {
       return { ...val, ...{ image: `${APP_URL}public/uploads/books/` + val.image } }
     })
