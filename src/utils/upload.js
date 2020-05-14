@@ -18,7 +18,6 @@ module.exports = {
         fileFilter: (req, file, cb) => {
           let ext = path.extname(file.originalname)
           ext = ext.replace('.', '')
-          console.log(req.file)
           if ((ext === 'png' ||
                ext === 'PNG' ||
                ext === 'jpg' ||
@@ -29,9 +28,6 @@ module.exports = {
           } else {
             cb(null, false)
           }
-        },
-        limits: {
-          fileSize: 1240000
         }
       })
   }

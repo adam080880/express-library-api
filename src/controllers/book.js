@@ -9,7 +9,13 @@ const fs = require('fs')
 
 module.exports = {
   get: async (req, res) => {
+    const { APP_URL } = process.env
+
     const data = await pagination(req.query, bookModel, 'books', 'book')
+    data.data = data.data.map((val, index) => {
+      return { ...val, ...{ image: `${APP_URL}public/uploads/books/` + val.image } }
+    })
+
     return res.status(200).send(response(data.success, data.data, data.msg, { pageInfo: data.pageInfo }))
   },
   getOne: async (req, res) => {
@@ -26,19 +32,30 @@ module.exports = {
   post: async (req, res) => {
     const { title, description, genre_id: genreId, author_id: authorId } = req.body
 
+    const data = { ...req.body, ...{ image: req.file.filename || null } }
+
     if (!isFilled({ title, description, genreId, authorId, file: req.file })) {
-      return res.status(400).send(response(false, req.body, 'Title, description, file, genre_id, and author_id must be filled'))
+      return res.status(400).send(response(false, data, 'Title, description, image, genre_id, and author_id must be filled'))
     }
 
     const genreExists = await isExists({ id: genreId }, 'genres')
     const authorExists = await isExists({ id: authorId }, 'authors')
     if (!genreExists || !authorExists) {
-      return res.status(400).send(response(false, req.body, 'Genre_id or author_id must be valid data'))
+      return res.status(400).send(response(false, data, 'Genre_id or author_id must be valid data'))
     }
 
-    const result = bookModel.create({ title, description, genre_id: genreId, author_id: authorId, image: req.file.filename, book_status_id: 1 })
-    if (result) return res.status(201).send(response(true, req.body, 'Book successfully created'))
-    else res.status(500).send(response(false, req.body, 'Internal server error or unhandled error'))
+    if (req.file.size > 1024000) {
+      try {
+        await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      } catch (e) {
+        throw Error(e)
+      }
+      return res.status(400).send(response(false, data, 'Image size is more than max size (Max: 1024KB)'))
+    }
+
+    const result = await bookModel.create({ title, description, genre_id: genreId, author_id: authorId, image: req.file.filename, book_status_id: 1 })
+    if (result) return res.status(201).send(response(true, data, 'Book successfully created'))
+    else res.status(500).send(response(false, data, 'Internal server error or unhandled error'))
   },
   patch: async (req, res) => {
     const { id } = req.params
@@ -59,11 +76,20 @@ module.exports = {
 
     let image = bookExists.image
     if (req.file) {
-      try {
-        await fs.unlinkSync(`public/uploads/books/${image}`)
-        image = req.file.filename
-      } catch (e) {
-        throw Error(e)
+      if (req.file.size > 1024000) {
+        try {
+          await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+        } catch (e) {
+          throw Error(e)
+        }
+        return res.status(400).send(response(false, data, 'Image size is more than max size (Max: 1024KB)'))
+      } else {
+        try {
+          await fs.unlinkSync(`public/uploads/books/${image}`)
+          image = req.file.filename
+        } catch (e) {
+          throw Error(e)
+        }
       }
     }
 
