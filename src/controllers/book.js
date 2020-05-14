@@ -10,15 +10,18 @@ const fs = require('fs')
 module.exports = {
   get: async (req, res) => {
     const data = await pagination(req.query, bookModel, 'books', 'book')
-    return res.status(200).send(data)
+    return res.status(200).send(response(data.success, data.data, data.msg, { pageInfo: data.pageInfo }))
   },
   getOne: async (req, res) => {
     const { id } = req.params
     const { APP_URL } = process.env
 
+    const bookExists = await isExists({ id }, 'books')
+    if (!bookExists) return res.status(404).send(response(false, { id }, 'Book is not found'))
+
     const data = await bookModel.getOne({ id })
     const result = { ...data.data, ...{ image: `${APP_URL}public/uploads/books/` + data.data.image }, histories: data.histories }
-    return res.status(200).send(result)
+    return res.status(200).send(response(true, result, `Book with ID #${id}`))
   },
   post: async (req, res) => {
     const { title, description, genre_id: genreId, author_id: authorId } = req.body

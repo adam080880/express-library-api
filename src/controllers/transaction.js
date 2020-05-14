@@ -8,7 +8,7 @@ const pagination = require('../utils/pagination')
 module.exports = {
   get: async (req, res) => {
     const data = await pagination(req.query, transactionModel, 'transactions', 'transaction')
-    return res.status(200).send(data)
+    return res.status(200).send(response(data.success, data.data, data.msg, { pageInfo: data.pageInfo }))
   },
   toBorrow: async (req, res) => {
     const { id } = req.params
