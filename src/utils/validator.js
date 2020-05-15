@@ -7,8 +7,8 @@ module.exports = {
         con.query(`SELECT * FROM ${table} WHERE ${val} = '${data[val]}'`, (err, res) => {
           if (err || !res) reject(Error(err))
           if (res.length === 1) resolve(res[0])
-          else if (res.length > 1) resolve(res[0])
-          else resolve(false)
+          else if (res.length > 1) resolve(res)
+          else resolve(null)
         })
       })
     })

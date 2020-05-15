@@ -21,7 +21,8 @@ module.exports = {
       const bioExists = await isExists({ user_id: userExists.id }, 'user_details')
       const jwt2 = jsonWebToken.sign({ user: { ...userExists, ...{ bio: bioExists || null } } }, SECRET_KEY)
       return res.status(200).send(response(true, {
-        token: jwt2
+        ...{ email: userExists.email, name: bioExists.name, role: (userExists.role_id === 3) ? 'Super Admin' : (userExists.role_id === 1) ? 'Admin' : 'Member' },
+        ...{ token: 'Bearer ' + jwt2 }
       }, 'Login success'))
     } else {
       return res.status(403).send(response(false, req.body, 'Password didn\'t match'))

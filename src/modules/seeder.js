@@ -13,12 +13,16 @@ const data = {
     {
       id: 2,
       role: 'member'
+    },
+    {
+      id: 3,
+      role: 'super_admin'
     }
   ],
   users: [
     {
       id: 1,
-      role_id: 1,
+      role_id: 3,
       email: 'admin@server.co',
       password: getPassword('helloworld')
     },

@@ -28,6 +28,9 @@ module.exports = {
           } else {
             cb(null, false)
           }
+        },
+        limits: {
+          fileSize: 1240000
         }
       })
   }

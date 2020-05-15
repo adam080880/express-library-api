@@ -26,6 +26,16 @@ module.exports = {
       })
     })
   },
+  getMember: (start, end, data = []) => {
+    const sql = `SELECT users.id, users.email, user_details.name, user_details.birthdate, user_details.phone, user_details.gender, roles.role as role FROM ${table}, ${table2}, roles WHERE ${table}.role_id=2 AND (name LIKE ? OR email LIKE ?) AND ${table}.id=${table2}.user_id AND ${table}.role_id=roles.id ORDER BY ${data[1]} ${data[2]} LIMIT ${end} OFFSET ${start}`
+    return new Promise((resolve, reject) => {
+      const search = ('%' + data[0] + '%')
+      con.query(sql, [search, search], (err, res) => {
+        if (err) reject(Error(err))
+        resolve(res)
+      })
+    })
+  },
   changeRole: (data) => {
     const sql = `UPDATE ${table} SET ? WHERE ?`
     return new Promise((resolve, reject) => {
