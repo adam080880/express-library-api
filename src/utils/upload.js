@@ -26,7 +26,7 @@ module.exports = {
                ext === 'jpeg')) {
             cb(null, true)
           } else {
-            cb(null, false)
+            cb(null, new Error('Error uploading file, not passing validation'))
           }
         },
         limits: {
