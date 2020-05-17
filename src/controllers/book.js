@@ -55,6 +55,7 @@ module.exports = {
   },
   patch: async (req, res) => {
     const { id } = req.params
+
     const { title, description, genre_id: genreId, author_id: authorId } = req.body
 
     const data = { ...req.body, ...{ id } }
