@@ -1,5 +1,5 @@
 # my-library-api
-This repository is an open source code. Built for libraries that want to handle online transactions.
+This repository is an open source code. Built for libraries that want to handle online transactions and allow member to can show list books and can make a reservation to booking a book.
 ## Instalation
 ```
 git clone https://github.com/adam080880/my-library-api
