@@ -47,16 +47,16 @@ nodemon
 * ``` POST ``` /books -> need JWT Token -> admin and super admin only
 * ``` PATCH ``` /books/:id -> need JWT Token -> admin and super admin only
 * ``` DELETE ``` /books/:id -> need JWT Token -> admin and super admin only
-### Author [Need: JWT Token, admin and super admin only]
+### Author
 * ``` GET ``` /author
-* ``` POST ``` /author
-* ``` PATCH ``` /author/:id
-* ``` DELETE ``` /author/:id
-### Genre [Need: JWT Token, admin and super admin only]
+* ``` POST ``` /author -> Need: JWT Token, admin and super admin only
+* ``` PATCH ``` /author/:id -> Need: JWT Token, admin and super admin only
+* ``` DELETE ``` /author/:id -> Need: JWT Token, admin and super admin only
+### Genre
 * ``` GET ``` /genre
-* ``` POST ``` /genre
-* ``` PATCH ``` /genre/:id
-* ``` DELETE ``` /genre/:id
+* ``` POST ``` /genre -> Need: JWT Token, admin and super admin only
+* ``` PATCH ``` /genre/:id -> Need: JWT Token, admin and super admin only
+* ``` DELETE ``` /genre/:id -> Need: JWT Token, admin and super admin only
 ### User [Need: JWT Token]
 * ``` GET ``` /user -> super admin and admin
 * ``` GET ``` /user/member -> super admin and admin
