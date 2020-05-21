@@ -23,13 +23,10 @@ module.exports = {
   count: (data) => {
     return new Promise((resolve, reject) => {
       const query = '%' + data[0] + '%'
-      con.query(`SELECT t.id, t.promise_returned_at, books.title as book_title,
-                (SELECT users.email FROM users WHERE users.id=t.admin_id) as admin,
-                (SELECT users.email FROM users WHERE users.id=t.member_id) as member,
-                transaction_statuses.name as status FROM ${table} t,
+      con.query(`SELECT COUNT(*) as total FROM ${table} t,
                 books, transaction_statuses WHERE transaction_statuses.id=t.transaction_status_id
                 AND books.id=t.book_id AND (books.title LIKE ? OR (SELECT users.email FROM users WHERE users.id=t.admin_id) LIKE ? OR (SELECT users.email FROM users WHERE users.id=t.member_id) LIKE ?
-                OR transaction_statuses.name LIKE ?) ORDER BY ${data[1]} ${data[2]}`, [query, query, query, query], (err, res) => {
+                OR transaction_statuses.name LIKE ?)`, [query, query, query, query], (err, res) => {
         if (err) reject(Error(err))
         resolve(res[0].total)
       })

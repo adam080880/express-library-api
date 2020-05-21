@@ -29,8 +29,8 @@ module.exports = {
     const userExists = await isExists({ id }, 'users')
     if (!userExists) return res.status(404).send(response(false, req.params, 'User id is not valid'))
 
-    const transactions = await isExists({ member_id: id }, 'transactions')
-    return res.status(200).send(response(false, { ...userExists, ...{ histories: transactions } }))
+    const transactions = await isExists({ member_id: `${id}' AND books.id=transactions.book_id AND ''='` }, 'transactions, books')
+    return res.status(200).send(response(true, { ...userExists, ...{ histories: transactions } }))
   },
   find: async (req, res) => {
     delete req.me.password

@@ -18,11 +18,16 @@ module.exports = {
     if (!userExists) return res.status(404).send(response(false, req.body, 'Email is not found'))
 
     if (bcryptjs.compareSync(password, userExists.password)) {
-      const bioExists = await isExists({ user_id: userExists.id }, 'user_details')
+      let bioExists = await isExists({ user_id: userExists.id }, 'user_details')
       const jwt2 = jsonWebToken.sign({ user: { ...userExists, ...{ bio: bioExists || null } } }, SECRET_KEY)
+      if (!bioExists) {
+        bioExists = {
+          name: null
+        }
+      }
       return res.status(200).send(response(true, {
         ...{ email: userExists.email, name: bioExists.name, role: (userExists.role_id === 3) ? 'Super Admin' : (userExists.role_id === 1) ? 'Admin' : 'Member' },
-        ...{ token: 'Bearer ' + jwt2 }
+        ...{ token: jwt2 }
       }, 'Login success'))
     } else {
       return res.status(403).send(response(false, req.body, 'Password didn\'t match'))

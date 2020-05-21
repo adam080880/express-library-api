@@ -1,5 +1,4 @@
 const multer = require('multer')
-const path = require('path')
 
 module.exports = {
   book: () => {
@@ -16,14 +15,10 @@ module.exports = {
       {
         storage,
         fileFilter: (req, file, cb) => {
-          let ext = path.extname(file.originalname)
-          ext = ext.replace('.', '')
-          if ((ext === 'png' ||
-               ext === 'PNG' ||
-               ext === 'jpg' ||
-               ext === 'JPG' ||
-               ext === 'JPEG' ||
-               ext === 'jpeg')) {
+          const ext = file.mimetype.toLowerCase()
+          if ((ext === 'image/png' ||
+               ext === 'image/jpeg' ||
+               ext === 'image/jpg')) {
             cb(null, true)
           } else {
             cb(null, new Error('Error uploading file, not passing validation'))

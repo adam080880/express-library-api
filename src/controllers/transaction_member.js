@@ -15,6 +15,11 @@ module.exports = {
     if (!isBookExists) return res.status(400).send(response(false, data, 'Book id must be valid data'))
     if (parseInt(isBookExists.book_status_id) === 2) return res.status(400).send(response(false, data, 'Status book is not available'))
 
+    const late = (new Date().getTime() - new Date(promiseReturnedAt).getTime()) / (1000 * 24 * 3600)
+    if (Math.floor(late) > 0) {
+      return res.status(400).send(response(false, data, 'Promise return date is not valid'))
+    }
+
     const result = await transactionMember.createTransaction({ member_id: userId, book_id: bookId, promise_returned_at: promiseReturnedAt })
     if (result) return res.status(201).send(response(true, data, 'Transaction successfully created'))
     else return res.status(500).send(response(false, data, 'Internal server error or unhandled error'))

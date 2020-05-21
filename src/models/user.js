@@ -4,8 +4,7 @@ const table2 = 'user_details'
 
 module.exports = {
   count: (data) => {
-    const fixDataId = data[1] === 'id' ? 'users.id' : data[1]
-    const query = `SELECT COUNT(*) as total FROM ${table}, ${table2}, roles WHERE (name LIKE ? OR email LIKE ?) AND ${table}.id=${table2}.user_id AND ${table}.role_id=roles.id ORDER BY ${fixDataId} ${data[2]}`
+    const query = `SELECT COUNT(*) as total FROM ${table}, ${table2}, roles WHERE (name LIKE ? OR email LIKE ?) AND ${table}.id=${table2}.user_id AND ${table}.role_id=roles.id`
     return new Promise((resolve, reject) => {
       const search = ('%' + data[0] + '%')
       con.query(query,

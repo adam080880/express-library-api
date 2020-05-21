@@ -32,10 +32,12 @@ module.exports = {
   post: async (req, res) => {
     const { title, description, genre_id: genreId, author_id: authorId } = req.body
 
-    const data = { ...req.body, ...{ image: req.file.filename || null } }
+    const data = { ...req.body, ...{ image: (req.file) ? req.file.filename : null } }
 
     if (!isFilled({ title, description, genreId, authorId, file: req.file })) {
-      await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      if (req.file) {
+        await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      }
       return res.status(400).send(response(false, data, 'Title, description, image, genre_id, and author_id must be filled'))
     }
 
@@ -61,7 +63,9 @@ module.exports = {
     const data = { ...req.body, ...{ id } }
 
     if (!isFilled({ title, description, genreId, authorId, id })) {
-      await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      if (req.file) {
+        await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      }
       return res.status(400).send(response(false, data, 'Title, description, genre_id, and author_id must be filled'))
     }
 
