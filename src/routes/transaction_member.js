@@ -9,6 +9,7 @@ router.use(needAuth)
 router.use(memberOnly)
 router.use(needBio)
 
+router.get('/', transactionMemberController.get)
 router.post('/', transactionMemberController.booking)
 
 module.exports = router

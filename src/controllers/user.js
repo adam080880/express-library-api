@@ -30,7 +30,15 @@ module.exports = {
     if (!userExists) return res.status(404).send(response(false, req.params, 'User id is not valid'))
 
     const transactions = await isExists({ member_id: `${id}' AND books.id=transactions.book_id AND ''='` }, 'transactions, books')
-    return res.status(200).send(response(true, { ...userExists, ...{ histories: transactions } }))
+    return res.status(200).send(response(true, {
+      ...{ ...userExists, password: null },
+      ...{
+        histories: transactions.map((val, index) => {
+          const date = new Date(val.promise_returned_at)
+          return { ...val, promise_returned_at: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}` }
+        })
+      }
+    }))
   },
   find: async (req, res) => {
     delete req.me.password

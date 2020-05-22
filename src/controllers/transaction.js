@@ -8,7 +8,10 @@ const pagination = require('../utils/pagination')
 module.exports = {
   get: async (req, res) => {
     const data = await pagination(req.query, transactionModel, 'transactions', 'transaction')
-    return res.status(200).send(response(data.success, data.data, data.msg, { pageInfo: data.pageInfo }))
+    return res.status(200).send(response(data.success, data.data.map((val, index) => {
+      const date = new Date(val.promise_returned_at)
+      return { ...val, promise_returned_at: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}` }
+    }), data.msg, { pageInfo: data.pageInfo }))
   },
   toBorrow: async (req, res) => {
     const { id } = req.params
@@ -20,8 +23,13 @@ module.exports = {
 
     const check = await transactionModel.getOne({ id })
     if (!check) return res.status(400).send(response(false, data, 'Transaction id must be valid data'))
-    if (check.returnedAt === null || check.returnedAt === 'null' || check.returnedAt === 'NULL') return res.status(400).send(response(false, data, 'Returned is already filled'))
+    if (!(check.returned_at === null || check.returned_at === 'null' || check.returned_at === 'NULL')) return res.status(400).send(response(false, data, 'Returned is already filled'))
     if (check.transaction_status_id === 3 || check.transaction_status_id === 2) return res.status(400).send(response(false, data, 'Status is not valid'))
+
+    const validDate = (new Date().getTime() - new Date(check.promise_returned_at).getTime()) / (1000 * 24 * 3600)
+    if (Math.floor(validDate) >= 0) {
+      return res.status(400).send(response(false, data, 'Promise return date is not valid'))
+    }
 
     const result = await transactionModel.toBorrow([{ admin_id: userId }, { id }])
     if (result) return res.status(200).send(response(true, data, 'Data has been updated to status borrowed'))
