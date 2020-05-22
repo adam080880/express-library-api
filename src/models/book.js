@@ -58,7 +58,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       con.query(sql, data, (err, res) => {
         if (err) reject(Error(err))
-        if (res.affectedRows > 0) resolve(true)
+        if (res.affectedRows >= 0) resolve(true)
         else resolve(false)
       })
     })

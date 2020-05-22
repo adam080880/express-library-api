@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({
   extended: false
 }))
 app.use(cors())
+app.use('/public', express.static('public'))
 
 const authorRouter = require('./src/routes/author')
 const bookRouter = require('./src/routes/book')

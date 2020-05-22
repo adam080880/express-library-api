@@ -73,20 +73,28 @@ module.exports = {
     const genreExists = await isExists({ id: genreId }, 'genres')
     const authorExists = await isExists({ id: authorId }, 'authors')
     if (!genreExists || !authorExists || !bookExists) {
-      await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      if (req.file) {
+        await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      }
       return res.status(400).send(response(false, data, 'Genre_id or book_id or author_id must be valid data'))
     }
 
     let image = bookExists.image
     if (req.file) {
-      await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      try {
+        await fs.unlinkSync(`public/uploads/books/${image}`)
+      } catch (e) {
+        console.log(e)
+      }
       image = req.file.filename
     }
 
     const result = bookModel.update([{ title, description, genre_id: genreId, author_id: authorId, image, book_status_id: 1 }, { id }])
     if (result) return res.status(200).send(response(true, data, 'Book has been updated'))
     else {
-      await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      if (req.file) {
+        await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      }
       res.status(500).send(response(false, data, 'Internal server error or unhandled error'))
     }
   },
