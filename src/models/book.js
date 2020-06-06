@@ -16,7 +16,7 @@ module.exports = {
     })
   },
   get: (start, end, data = []) => {
-    const sql = `SELECT * FROM ${table} WHERE title LIKE ? ORDER BY ${data[1]} ${data[2]} LIMIT ${end} OFFSET ${start}`
+    const sql = `SELECT books.id, books.title, books.description, books.image, genres.name as genre, authors.name as author, book_statuses.name as status FROM ${table}, genres, book_statuses, authors WHERE books.book_status_id = book_statuses.id AND books.genre_id = genres.id AND authors.id = books.author_id AND title LIKE ? ORDER BY ${data[1]} ${data[2]} LIMIT ${end} OFFSET ${start}`
     return new Promise((resolve, reject) => {
       con.query(sql, [('%' + data[0] + '%')], (err, res) => {
         if (err) reject(Error(err))
