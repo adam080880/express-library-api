@@ -1,6 +1,6 @@
 const transactionModel = require('../models/transaction')
 
-const { isFilled } = require('../utils/validator')
+const { isFilled, isExists } = require('../utils/validator')
 const response = require('../utils/response')
 
 const pagination = require('../utils/pagination')
@@ -64,5 +64,17 @@ module.exports = {
     } else {
       return res.status(400).send(response(false, data, 'Transaction id must be valid data'))
     }
+  },
+  toCancel: async (req, res) => {
+    const {id} = req.params
+
+    if (!isFilled({ id })) return res.status(400).send(response(false, {id}, 'ID must be filled'))
+
+    const exist = await isExists({id}, 'transactions')
+    if (!exist) return res.status(400).send(response(false, {id}, 'Transaction ID must be valid'))
+
+    const result = await transactionModel.cancelBooking({ id, book_id: exist.book_id })
+    if (result) return res.status(200).send(response(true, {id}, 'Transaction book has been canceled'))
+    else return res.status(500).send(response(false, {id}, 'Transaction failed to cancel'))
   }
 }

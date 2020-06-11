@@ -13,9 +13,9 @@ module.exports = (req, res, next) => {
 
     const me = jsonWebToken.verify(authorization || req.query._token || req.body._token, SECRET_KEY)
     req.me = me.user
+    next()
   } catch (e) {
     return res.status(403).send(response(false, req.body, 'This access need authorization'))
   }
 
-  next()
 }

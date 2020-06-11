@@ -15,7 +15,7 @@ module.exports = {
       con.query(sql, [search, search, search], (err, res) => {
         if (err) reject(Error(err))
         if (res.length > 0) resolve(res)
-        else resolve(false)
+        else resolve(res)
       })
     })
   },

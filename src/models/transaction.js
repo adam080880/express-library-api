@@ -7,7 +7,7 @@ module.exports = {
     const sql = `SELECT t.id, t.promise_returned_at, books.title as book_title,
                  (SELECT users.email FROM users WHERE users.id=t.admin_id) as admin,
                  (SELECT users.email FROM users WHERE users.id=t.member_id) as member,
-                 transaction_statuses.name as status FROM ${table} t,
+                 transaction_statuses.name as status, t.updated_at as last_updated FROM ${table} t,
                  books, transaction_statuses WHERE transaction_statuses.id=t.transaction_status_id
                  AND books.id=t.book_id AND (books.title LIKE ? OR (SELECT users.email FROM users WHERE users.id=t.admin_id) LIKE ? OR (SELECT users.email FROM users WHERE users.id=t.member_id) LIKE ?
                  OR transaction_statuses.name LIKE ?) ORDER BY ${data[1]} ${data[2]} LIMIT ${end} OFFSET ${start}`
@@ -16,7 +16,7 @@ module.exports = {
       con.query(sql, [search, search, search, search], (err, res) => {
         if (err) reject(Error(err))
         if (res.length > 0) resolve(res)
-        else resolve(false)
+        else resolve(res)
       })
     })
   },
@@ -40,6 +40,39 @@ module.exports = {
 
         if (res.length > 0) resolve(res[0])
         else resolve(false)
+      })
+    })
+  },
+  cancelBooking: (_data) => {
+    const sql = `DELETE FROM ${table} WHERE ?`
+    const sql2 = 'UPDATE books SET book_status_id=1 WHERE ?'
+
+    const { id, book_id: bookId } = _data
+    const data = { id }
+    const data2 = { id: bookId }
+    return new Promise((resolve, reject) => {
+      con.beginTransaction(() => {
+        con.query(sql, data, (err, res) => {
+          if (err) {
+            con.rollback((rollbackErr) => {
+              if (rollbackErr) reject(Error(rollbackErr).message)
+              else reject(err.message)
+            })
+          }
+        })
+        con.query(sql2, data2, (err, res) => {
+          if (err) {
+            con.rollback((rollbackErr) => {
+              if (rollbackErr) reject(Error(rollbackErr).message)
+              else reject(err.message)
+            })
+          }
+          con.commit((commitError) => {
+            if (commitError) reject(Error(commitError).message)
+            if (res.affectedRows > 0) resolve(true)
+            else resolve(false)
+          })
+        })
       })
     })
   },

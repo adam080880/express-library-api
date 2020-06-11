@@ -15,13 +15,13 @@ module.exports = {
       {
         storage,
         fileFilter: (req, file, cb) => {
-          const ext = file.mimetype.toLowerCase()
-          if ((ext === 'image/png' ||
-               ext === 'image/jpeg' ||
-               ext === 'image/jpg')) {
+          const ext = file.mimetype.toLowerCase().split('/')[0]
+          if (ext === 'image') {
+            console.log('s')
             cb(null, true)
           } else {
-            cb(null, new Error('Error uploading file, not passing validation'))
+            console.log('f')
+            cb(new Error('Error uploading file, not passing validation'), new Error('Error uploading file, not passing validation'))
           }
         },
         limits: {

@@ -1,6 +1,11 @@
 const express = require('express')
 const app = express()
 
+const morgan = require('morgan')
+const fs = require('fs')
+const path = require('path')
+
+
 require('dotenv').config()
 const { APP_PORT } = process.env
 
@@ -11,6 +16,7 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(cors())
 app.use('/public', express.static('public'))
+app.use(morgan('dev'))
 
 const authorRouter = require('./src/routes/author')
 const bookRouter = require('./src/routes/book')

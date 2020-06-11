@@ -26,7 +26,7 @@ module.exports = {
   },
   getOne: async (data) => {
     const { id } = data
-    const sql = `SELECT books.id, books.title, books.description, books.image, genres.name as genre, authors.name as author, book_statuses.name AS status FROM ${table + ', ' + relationalTable} WHERE books.book_status_id=book_statuses.id AND books.author_id=authors.id AND books.genre_id=genres.id AND books.?`
+    const sql = `SELECT books.id, books.title, books.description, books.image, genres.name as genre, authors.name as author, book_statuses.name AS status, books.author_id, books.genre_id FROM ${table + ', ' + relationalTable} WHERE books.book_status_id=book_statuses.id AND books.author_id=authors.id AND books.genre_id=genres.id AND books.?`
     const sql2 = 'SELECT transactions.id, (SELECT email FROM users WHERE transactions.member_id=users.id) AS member, (SELECT email FROM users WHERE transactions.admin_id=users.id) AS admin, transactions.updated_at AS last_updated from transactions WHERE ?'
     let result = {}
 

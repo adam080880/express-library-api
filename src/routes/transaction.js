@@ -10,5 +10,6 @@ router.use(adminOnly)
 router.get('/', transactionController.get)
 router.patch('/borrow/:id', transactionController.toBorrow)
 router.patch('/return/:id', transactionController.toReturned)
+router.patch('/cancel/:id', transactionController.toCancel)
 
 module.exports = router
