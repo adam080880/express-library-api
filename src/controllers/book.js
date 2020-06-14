@@ -3,9 +3,10 @@ const { isFilled, isExists } = require('../utils/validator')
 const bookModel = require('../models/book')
 const pagination = require('../utils/pagination')
 
-require('dotenv').config()
-
+const imgConvert = require('image-convert')
 const fs = require('fs')
+
+require('dotenv').config()
 
 module.exports = {
   get: async (req, res) => {
@@ -30,6 +31,7 @@ module.exports = {
     return res.status(200).send(response(true, result, `Book with ID #${id}`))
   },
   post: async (req, res) => {
+    const { APP_URL } = process.env
     const { title, description, genre_id: genreId, author_id: authorId } = req.body
 
     const data = { ...req.body, ...{ image: (req.file) ? req.file.filename : null } }
@@ -48,10 +50,36 @@ module.exports = {
       return res.status(400).send(response(false, data, 'Genre_id or author_id must be valid data'))
     }
 
-    const result = await bookModel.create({ title, description, genre_id: genreId, author_id: authorId, image: req.file.filename, book_status_id: 1 })
+    // Convert from png to jpg
+    let image = req.file.filename
+    if (req.file.mimetype === 'image/png') {
+      const promiseFileConvert = new Promise((resolve, reject) => {
+        const oldImage = `${APP_URL}public/uploads/books/` + req.file.filename
+        imgConvert.fromURL({
+          url: oldImage,
+          quality: 100,
+          output_format: 'jpg'
+        }, async (err, buffer, file) => {
+          await fs.writeFile(`./public/uploads/books/${file.name}`, buffer, async (err) => {
+            await fs.unlinkSync(`public/uploads/books/${image}`)
+            resolve(file.name)
+            reject(image)
+          })
+        })
+      })
+
+      await promiseFileConvert.then((res) => {
+        image = res
+      })
+      .catch((rej) => {
+        image = rej
+      })
+    }
+
+    const result = await bookModel.create({ title, description, genre_id: genreId, author_id: authorId, image: image, book_status_id: 1 })
     if (result) return res.status(201).send(response(true, data, 'Book successfully created'))
     else {
-      await fs.unlinkSync(`public/uploads/books/${req.file.filename}`)
+      await fs.unlinkSync(`public/uploads/books/${image}`)
       res.status(500).send(response(false, data, 'Internal server error or unhandled error'))
     }
   },
@@ -115,7 +143,7 @@ module.exports = {
     try {
       await fs.unlinkSync(`public/uploads/books/${bookExists.image}`)
     } catch (e) {
-      throw Error(e)
+      console.log(e)
     }
 
     const result = await bookModel.delete({ id })
