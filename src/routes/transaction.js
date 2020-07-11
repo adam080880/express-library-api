@@ -1,15 +1,15 @@
-const router = require('express').Router()
-const transactionController = require('../controllers/transaction')
+const router = require("express").Router();
+const transactionController = require("../controllers/transaction");
 
-const needAuth = require('../middlewares/need_auth')
-const adminOnly = require('../middlewares/role_admin')
+const needAuth = require("../middlewares/need_auth");
+const adminOnly = require("../middlewares/role_admin");
 
-router.use(needAuth)
-router.use(adminOnly)
+router.use(needAuth);
 
-router.get('/', transactionController.get)
-router.patch('/borrow/:id', transactionController.toBorrow)
-router.patch('/return/:id', transactionController.toReturned)
-router.patch('/cancel/:id', transactionController.toCancel)
+router.get("/", adminOnly, transactionController.get);
+router.patch("/borrow/:id", adminOnly, transactionController.toBorrow);
+router.patch("/return/:id", adminOnly, transactionController.toReturned);
+router.patch("/cancel/:id", adminOnly, transactionController.toCancel);
+router.get("/not_returned", transactionController.notReturned);
 
-module.exports = router
+module.exports = router;

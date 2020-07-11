@@ -9,6 +9,20 @@ const fs = require("fs");
 require("dotenv").config();
 
 module.exports = {
+  popular: async (req, res) => {
+    const { APP_URL } = process.env;
+    const data = await bookModel.popular();
+    return res.status(200).send(
+      response(
+        true,
+        data.map((val, index) => ({
+          ...val,
+          ...{ image: `${APP_URL}public/uploads/books/${val.image}` },
+        })),
+        "List popular"
+      )
+    );
+  },
   get: async (req, res) => {
     const { APP_URL } = process.env;
 
@@ -16,7 +30,7 @@ module.exports = {
     data.data = data.data.map((val, index) => {
       return {
         ...val,
-        ...{ image: `${APP_URL}public/uploads/books/` + val.image },
+        ...{ image: `${APP_URL}public/uploads/books/${val.image}` },
       };
     });
 
@@ -191,7 +205,6 @@ module.exports = {
         genre_id: genreId,
         author_id: authorId,
         image,
-        book_status_id: 1,
       },
       { id },
     ]);

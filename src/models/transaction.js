@@ -3,6 +3,16 @@ const con = require("../utils/db");
 const table = "transactions";
 
 module.exports = {
+  notReturned: (userId) => {
+    const sql = `SELECT t.id, t.updated_at as last_updated, b.title, ts.name as status from transactions t, transaction_statuses ts, books b where t.transaction_status_id=ts.id AND t.book_id=b.id AND (t.transaction_status_id=2 OR t.transaction_status_id=1) AND t.member_id=${userId} ORDER BY t.transaction_status_id`;
+    return new Promise((resolve, reject) => {
+      con.query(sql, (err, res) => {
+        if (err) reject(Error(err));
+        if (res.length > 0) resolve(res);
+        else resolve(res);
+      });
+    });
+  },
   get: (start, end, data) => {
     const sql = `SELECT t.id, t.promise_returned_at, books.title as book_title,
                  (SELECT users.email FROM users WHERE users.id=t.admin_id) as admin,

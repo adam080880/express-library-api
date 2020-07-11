@@ -1,4 +1,5 @@
 const con = require("../utils/db");
+const { query } = require("../utils/db");
 
 const table = "books";
 const relationalTable = "authors, genres, book_statuses";
@@ -10,6 +11,15 @@ module.exports = {
       con.query(query, ["%" + data[0] + "%"], (err, res) => {
         if (err) reject(Error(err));
         resolve(res[0].total);
+      });
+    });
+  },
+  popular: () => {
+    const sql = `select books.id, books.title, books.image, COUNT(book_id) as counts from books, transactions WHERE books.id = transactions.book_id GROUP BY book_id order by counts desc limit 4`;
+    return new Promise((resolve, reject) => {
+      con.query(sql, (err, res) => {
+        if (err) reject(Error(err));
+        else resolve(res);
       });
     });
   },
