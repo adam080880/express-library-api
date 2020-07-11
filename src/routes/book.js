@@ -7,6 +7,7 @@ const adminOnly = require("../middlewares/role_admin");
 
 const { book: bookUpload } = require("../utils/upload");
 
+router.post("/review/:id", needAuth, bookController.review);
 router.get("/", bookController.get);
 router.get("/popular", bookController.popular);
 router.get("/:id", bookController.getOne);

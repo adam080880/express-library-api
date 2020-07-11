@@ -5,6 +5,35 @@ const table = "books";
 const relationalTable = "authors, genres, book_statuses";
 
 module.exports = {
+  getScore: (bookId) => {
+    const query = `SELECT AVG(stars) as average FROM reviews WHERE book_id=${bookId}`;
+    return new Promise((resolve, reject) => {
+      con.query(query, (err, res) => {
+        if (err) reject(Error(err));
+        if (res.length > 0) resolve(res[0]);
+        resolve({ average: 0 });
+      });
+    });
+  },
+  getReview: (bookId) => {
+    const query = `SELECT reviews.reviews, reviews.stars, user_details.name, users.email, user_details.profile FROM reviews, user_details, users WHERE book_id=${bookId} AND user_details.user_id=reviews.user_id AND users.id=reviews.user_id ORDER BY reviews.id DESC`;
+    return new Promise((resolve, reject) => {
+      con.query(query, (err, res) => {
+        if (err) reject(Error(err));
+        resolve(res);
+      });
+    });
+  },
+  review: (data) => {
+    const query = `INSERT INTO reviews SET ?`;
+    return new Promise((resolve, reject) => {
+      con.query(query, data, (err, res) => {
+        if (err) reject(Error(err));
+        if (res.affectedRows > 0) resolve(true);
+        else resolve(false);
+      });
+    });
+  },
   count: (data) => {
     const query = `SELECT COUNT(*) as total FROM ${table} WHERE title LIKE ? ORDER BY ${data[1]} ${data[2]}`;
     return new Promise((resolve, reject) => {

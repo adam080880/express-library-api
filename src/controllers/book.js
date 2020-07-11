@@ -23,6 +23,39 @@ module.exports = {
       )
     );
   },
+  review: async (req, res) => {
+    const { review, stars } = req.body;
+    const userId = req.me.id;
+    const { id: bookId } = req.params;
+
+    if (!isFilled({ review, stars, bookId })) {
+      return res
+        .status(400)
+        .send(
+          response(false, req.body, "book_id, review, stars must be valid data")
+        );
+    }
+
+    if (!isExists({ id: bookId }, "books")) {
+      return res.status(400).send(response(false, req.body, "book_id"));
+    }
+
+    const createReview = await bookModel.review({
+      book_id: bookId,
+      user_id: userId,
+      reviews: review,
+      stars,
+    });
+    if (createReview) {
+      return res
+        .status(201)
+        .send(response(true, req.body, "Review successfully created"));
+    } else {
+      return res
+        .status(500)
+        .send(response(false, req.body, "internal server error"));
+    }
+  },
   get: async (req, res) => {
     const { APP_URL } = process.env;
 
@@ -48,16 +81,25 @@ module.exports = {
     if (!bookExists)
       return res.status(404).send(response(false, { id }, "Book is not found"));
 
+    const reviews = await bookModel.getReview(id);
+    const score = await bookModel.getScore(id);
     const data = await bookModel.getOne({ id });
+    const newReviews = await reviews.map((val, index) => ({
+      ...val,
+      profile:
+        val.profile !== null
+          ? `${APP_URL}public/uploads/profile/`.concat(val.profile)
+          : null,
+    }));
     const result = {
       ...data.data,
       ...{ image: `${APP_URL}public/uploads/books/` + data.data.image },
       histories: data.histories,
+      ...{ newReviews, score },
     };
     return res.status(200).send(response(true, result, `Book with ID #${id}`));
   },
   post: async (req, res) => {
-    const { APP_URL } = process.env;
     const {
       title,
       description,
