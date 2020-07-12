@@ -58,7 +58,11 @@ module.exports = {
       )
     ) {
       if (req.file) {
-        await fs.unlinkSync(`public/uploads/profile/${userExists.profile}`);
+        try {
+          await fs.unlinkSync(`public/uploads/profile/${userExists.profile}`);
+        } catch (e) {
+          console.log(e);
+        }
       }
       return res
         .status(200)
